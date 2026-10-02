@@ -33,11 +33,11 @@ export class ToolsService {
   }
 
   private toolNotFound(id: number) {
-  return new NotFoundException({
-    error: 'Tool not found',
-    message: `Tool with ID ${id} does not exist`,
-  });
-}
+    return new NotFoundException({
+      error: 'Tool not found',
+      message: `Tool with ID ${id} does not exist`,
+    });
+  }
 
   async create(dto: CreateToolDto) {
     const category = await this.categoriesRepo.findOneBy({ id: dto.category_id });
@@ -139,10 +139,10 @@ export class ToolsService {
   }
 
   async update(id: number, dto: UpdateToolDto) {
-    if (Object.keys(dto).length === 0) {
+    const provided = Object.values(dto).filter((value) => value !== undefined);
+    if (provided.length === 0) {
       throw new BadRequestException('Aucun champ à modifier');
     }
-
     const tool = await this.toolsRepo.findOne({ where: { id }, relations: { category: true } });
     if (!tool) throw this.toolNotFound(id);
 
@@ -174,6 +174,7 @@ export class ToolsService {
     const updated = await this.toolsRepo.findOneOrFail({ where: { id }, relations: { category: true } });
     return { ...this.toListItem(updated), updated_at: updated.updatedAt };
   }
+
   remove(id: number) {
     return `This action removes a #${id} tool`;
   }

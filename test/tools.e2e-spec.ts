@@ -16,6 +16,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 // Les describe s'exécutent dans l'ordre : les lectures passent avant les écritures (POST/PUT).
 describe('Tools API (e2e)', () => {
   let app: INestApplication;
+  let ds: DataSource;
   let github: Tool;
   let slack: Tool;
   const api = () => request(app.getHttpServer());
@@ -26,7 +27,7 @@ describe('Tools API (e2e)', () => {
     configureApp(app);
     await app.init();
 
-    const ds = app.get(DataSource);
+    ds = app.get(DataSource);
     await ds.synchronize(true); // repart de tables vides dans la base de test
 
     const [comm, dev, design] = await ds
@@ -242,8 +243,9 @@ describe('Tools API (e2e)', () => {
 
   describe('PUT /api/tools/:id', () => {
     it('met à jour uniquement les champs fournis', async () => {
+      await ds.query("UPDATE tools SET updated_at = '2025-01-01 00:00:00' WHERE id = ?", [github.id]);
       const before = (await api().get(`/api/tools/${github.id}`).expect(200)).body;
-      await sleep(20);
+      expect(new Date(before.updated_at).getFullYear()).toBe(2025);
 
       const res = await api()
         .put(`/api/tools/${github.id}`)
