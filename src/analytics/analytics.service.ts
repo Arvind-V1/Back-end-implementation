@@ -8,6 +8,8 @@ import { buildExpensiveTools } from './expensive-tools.util';
 import { QueryExpensiveToolsDto } from './dto/query-expensive-tools.dto';
 import { Category } from '../tools/entities/category.entity';
 import { buildToolsByCategory } from './tools-by-category.util';
+import { QueryLowUsageToolsDto } from './dto/query-low-usage-tools.dto';
+import { buildLowUsageTools } from './low-usage-tools.util';
 
 @Injectable()
 export class AnalyticsService {
@@ -49,8 +51,12 @@ async getToolsByCategory() {
   }
 
   async getExpensiveTools(query: QueryExpensiveToolsDto) {
-  // Quelques centaines d'outils au plus : on charge les outils actifs et on calcule en mémoire
   const tools = await this.toolsRepo.find({ where: { status: ToolStatus.ACTIVE } });
   return buildExpensiveTools(tools, { minCost: query.min_cost, limit: query.limit });
-}
+  }
+
+  async getLowUsageTools(query: QueryLowUsageToolsDto) {
+    const tools = await this.toolsRepo.find({ where: { status: ToolStatus.ACTIVE } });
+    return buildLowUsageTools(tools, { maxUsers: query.max_users });
+  }
 }

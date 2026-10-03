@@ -3,6 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AnalyticsService } from './analytics.service';
 import { QueryDepartmentCostsDto } from './dto/query-department-costs.dto';
 import { QueryExpensiveToolsDto } from './dto/query-expensive-tools.dto';
+import { QueryLowUsageToolsDto } from './dto/query-low-usage-tools.dto';
 
 @ApiTags('analytics')
 @Controller('analytics')
@@ -71,5 +72,28 @@ export class AnalyticsController {
   })
   getToolsByCategory() {
     return this.analyticsService.getToolsByCategory();
+  }
+
+  @Get('low-usage-tools')
+  @ApiOperation({
+    summary: 'Outils sous-utilisés et économies potentielles',
+    description:
+      'Outils actifs avec active_users_count <= max_users (défaut 5, outils sans utilisateur inclus). ' +
+      'warning_level d\'après cost_per_user : < 20 low, 20 à 50 medium, > 50 high ; sans utilisateur : high. ' +
+      'potential_monthly_savings = somme des coûts des outils high et medium ; potential_annual_savings = × 12.',
+  })
+  @ApiResponse({ status: 200, description: 'Outils sous-utilisés et analyse des économies' })
+  @ApiResponse({
+    status: 400,
+    description: 'max_users invalide',
+    schema: { example: { error: 'Validation failed', details: { max_users: 'Must be a non-negative integer' } } },
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Erreur serveur',
+    schema: { example: { error: 'Internal server error', message: 'Database connection failed' } },
+  })
+  getLowUsageTools(@Query() query: QueryLowUsageToolsDto) {
+    return this.analyticsService.getLowUsageTools(query);
   }
 }
