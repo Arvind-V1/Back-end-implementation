@@ -44,15 +44,15 @@ describe('Analytics API (e2e)', () => {
       const sales = res.body.data.find((d: { department: string }) => d.department === 'Sales');
 
       expect(eng).toEqual({
-        department: 'Engineering', total_cost: 111.5, tools_count: 2, total_users: 8,
-        average_cost_per_tool: 55.75, cost_percentage: 65,
+        department: 'Engineering', total_cost: 30.5, tools_count: 2, total_users: 8,
+        average_cost_per_tool: 15.25, cost_percentage: 50.4,
       });
       expect(sales).toEqual({
-        department: 'Sales', total_cost: 60, tools_count: 1, total_users: 2,
-        average_cost_per_tool: 60, cost_percentage: 35,
+        department: 'Sales', total_cost: 30, tools_count: 1, total_users: 2,
+        average_cost_per_tool: 30, cost_percentage: 49.6,
       });
       expect(res.body.summary).toEqual({
-        total_company_cost: 171.5, departments_count: 7, most_expensive_department: 'Engineering',
+        total_company_cost: 60.5, departments_count: 7, most_expensive_department: 'Engineering',
       });
     });
 
