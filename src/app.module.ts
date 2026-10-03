@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ToolsModule } from './tools/tools.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ToolsModule } from './tools/tools.module';
       }),
     }),
     ToolsModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}
