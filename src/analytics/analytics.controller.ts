@@ -96,4 +96,22 @@ export class AnalyticsController {
   getLowUsageTools(@Query() query: QueryLowUsageToolsDto) {
     return this.analyticsService.getLowUsageTools(query);
   }
+
+  @Get('vendor-summary')
+  @ApiOperation({
+    summary: 'Synthèse par fournisseur',
+    description:
+      'Outils actifs groupés par vendor : coût total, utilisateurs, départements (uniques, ordre alphabétique) et coût moyen par utilisateur. ' +
+      'vendor_efficiency : < 5 excellent, 5 à < 15 good, 15 à 25 average, > 25 poor ; sans utilisateur : poor. ' +
+      'single_tool_vendors = vendors avec exactement 1 outil actif (opportunités de consolidation).',
+  })
+  @ApiResponse({ status: 200, description: 'Synthèse par vendor et insights comparatifs' })
+  @ApiResponse({
+    status: 500,
+    description: 'Erreur serveur',
+    schema: { example: { error: 'Internal server error', message: 'Database connection failed' } },
+  })
+  getVendorSummary() {
+    return this.analyticsService.getVendorSummary();
+  }
 }

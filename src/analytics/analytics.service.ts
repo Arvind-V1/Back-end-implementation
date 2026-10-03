@@ -10,6 +10,7 @@ import { Category } from '../tools/entities/category.entity';
 import { buildToolsByCategory } from './tools-by-category.util';
 import { QueryLowUsageToolsDto } from './dto/query-low-usage-tools.dto';
 import { buildLowUsageTools } from './low-usage-tools.util';
+import { buildVendorSummary } from './vendor-summary.util';
 
 @Injectable()
 export class AnalyticsService {
@@ -58,5 +59,10 @@ async getToolsByCategory() {
   async getLowUsageTools(query: QueryLowUsageToolsDto) {
     const tools = await this.toolsRepo.find({ where: { status: ToolStatus.ACTIVE } });
     return buildLowUsageTools(tools, { maxUsers: query.max_users });
+  }
+
+  async getVendorSummary() {
+    const tools = await this.toolsRepo.find({ where: { status: ToolStatus.ACTIVE } });
+    return buildVendorSummary(tools);
   }
 }
