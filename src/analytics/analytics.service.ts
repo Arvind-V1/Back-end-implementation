@@ -6,11 +6,34 @@ import { buildDepartmentCosts } from './department-costs.util';
 import { QueryDepartmentCostsDto } from './dto/query-department-costs.dto';
 import { buildExpensiveTools } from './expensive-tools.util';
 import { QueryExpensiveToolsDto } from './dto/query-expensive-tools.dto';
+import { Category } from '../tools/entities/category.entity';
+import { buildToolsByCategory } from './tools-by-category.util';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(@InjectRepository(Tool) private readonly toolsRepo: Repository<Tool>) {}
+  constructor(
+  @InjectRepository(Tool) private readonly toolsRepo: Repository<Tool>,
+  @InjectRepository(Category) private readonly categoriesRepo: Repository<Category>,
+) {}
 
+async getToolsByCategory() {
+  const [categories, rows] = await Promise.all([
+    this.categoriesRepo.find(),
+    this.toolsRepo
+      .createQueryBuilder('tool')
+      .innerJoin('tool.category', 'category')
+      .select('category.name', 'category_name')
+      .addSelect('COUNT(tool.id)', 'tools_count')
+      .addSelect('SUM(tool.monthlyCost)', 'total_cost')
+      .addSelect('SUM(tool.activeUsersCount)', 'total_users')
+      .where('tool.status = :status', { status: ToolStatus.ACTIVE })
+      .groupBy('category.id')
+      .addGroupBy('category.name')
+      .getRawMany(),
+  ]);
+
+  return buildToolsByCategory(rows, categories.map((c) => c.name));
+}
   async getDepartmentCosts(query: QueryDepartmentCostsDto) {
     const rows = await this.toolsRepo
       .createQueryBuilder('tool')

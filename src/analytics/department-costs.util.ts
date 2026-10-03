@@ -1,3 +1,4 @@
+import { allocatePercentTenths } from './percentages.util';
 export interface DepartmentRow {
   department: string;
   total_cost: string | number | null;
@@ -32,16 +33,8 @@ export function buildDepartmentCosts(
 
   const totalCents = items.reduce((sum, i) => sum + i.cents, 0);
 
-  if (totalCents > 0) {
-    const exact = items.map((i) => (i.cents * 1000) / totalCents);
-    items.forEach((i, idx) => (i.tenths = Math.floor(exact[idx])));
-    const remaining = 1000 - items.reduce((sum, i) => sum + i.tenths, 0);
-    exact
-      .map((e, idx) => ({ idx, fraction: e - Math.floor(e) }))
-      .sort((a, b) => b.fraction - a.fraction || byName(items[a.idx].department, items[b.idx].department))
-      .slice(0, remaining)
-      .forEach(({ idx }) => items[idx].tenths++);
-  }
+  const tenths = allocatePercentTenths(items.map((i) => i.cents), items.map((i) => i.department));
+  items.forEach((i, idx) => (i.tenths = tenths[idx]));
 
   const mostExpensive =
     totalCents > 0

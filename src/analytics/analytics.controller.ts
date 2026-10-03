@@ -53,4 +53,23 @@ export class AnalyticsController {
   getExpensiveTools(@Query() query: QueryExpensiveToolsDto) {
     return this.analyticsService.getExpensiveTools(query);
   }
+
+  @Get('tools-by-category')
+  @ApiOperation({
+    summary: 'Répartition des outils par catégorie',
+    description:
+      'Outils actifs. total_users = somme des active_users_count (sans dédoublonnage). ' +
+      'average_cost_per_user = total_cost / total_users (null sans utilisateur). ' +
+      'most_efficient_category = plus bas average_cost_per_user, catégories sans utilisateur exclues. ' +
+      'Les pourcentages totalisent 100. Toutes les catégories sont listées.',
+  })
+  @ApiResponse({ status: 200, description: 'Données par catégorie et insights' })
+  @ApiResponse({
+    status: 500,
+    description: 'Erreur serveur',
+    schema: { example: { error: 'Internal server error', message: 'Database connection failed' } },
+  })
+  getToolsByCategory() {
+    return this.analyticsService.getToolsByCategory();
+  }
 }
