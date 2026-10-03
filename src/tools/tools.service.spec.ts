@@ -246,5 +246,10 @@ describe('ToolsService', () => {
       );
       expect(result).toMatchObject({ monthly_cost: 7, status: 'deprecated', name: 'Confluence', updated_at: updatedAt });
     });
+    
+    it('refuse un body dont tous les champs valent undefined (instance transformée par le pipe)', async () => {
+      const dto = { name: undefined, vendor: undefined, monthly_cost: undefined, status: undefined };
+      await expect(service.update(5, dto)).rejects.toBeInstanceOf(BadRequestException);
+    });
   });
 });
