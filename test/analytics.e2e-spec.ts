@@ -90,7 +90,7 @@ describe('Analytics API (e2e)', () => {
     it('refuse un tri invalide (400)', async () => {
       const res = await api().get('/api/analytics/department-costs?sort_by=foo&order=up').expect(400);
 
-      expect(res.body.error).toBe('Validation failed');
+      expect(res.body.error).toBe('Invalid analytics parameter');
       expect(Object.keys(res.body.details).sort()).toEqual(['order', 'sort_by']);
     });
   });

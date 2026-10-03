@@ -98,7 +98,7 @@ describe('GET /api/analytics/low-usage-tools (e2e)', () => {
     for (const query of ['max_users=-1', 'max_users=abc', 'max_users=1.5']) {
       const res = await api().get(`/api/analytics/low-usage-tools?${query}`).expect(400);
 
-      expect(res.body.error).toBe('Validation failed');
+      expect(res.body.error).toBe('Invalid analytics parameter');
       expect(res.body.details.max_users).toBeDefined();
     }
   });

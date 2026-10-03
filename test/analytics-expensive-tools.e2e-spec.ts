@@ -89,7 +89,7 @@ describe('GET /api/analytics/expensive-tools (e2e)', () => {
     for (const query of ['limit=0', 'limit=abc', 'limit=101', 'min_cost=-1']) {
       const res = await api().get(`/api/analytics/expensive-tools?${query}`).expect(400);
 
-      expect(res.body.error).toBe('Validation failed');
+      expect(res.body.error).toBe('Invalid analytics parameter');
     }
   });
 });

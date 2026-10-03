@@ -10,8 +10,8 @@ export class QueryExpensiveToolsDto {
 
   @IsOptional()
   @Type(() => Number)
-  @IsInt({ message: 'Must be an integer between 1 and 100' })
-  @Min(1, { message: 'Must be an integer between 1 and 100' })
-  @Max(100, { message: 'Must be an integer between 1 and 100' })
+  @IsInt({ message: 'Must be positive integer between 1 and 100' })
+  @Min(1, { message: 'Must be positive integer between 1 and 100' })
+  @Max(100, { message: 'Must be positive integer between 1 and 100' })
   limit?: number;
 }

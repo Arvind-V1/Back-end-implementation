@@ -1,10 +1,12 @@
 import { ArgumentsHost, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { AllExceptionsFilter } from './all-exceptions.filter';
 
-function run(exception: unknown) {
+function run(exception: unknown, path = '/api/tools') {
   const json = jest.fn();
   const status = jest.fn().mockReturnValue({ json });
-  const host = { switchToHttp: () => ({ getResponse: () => ({ status }) }) } as unknown as ArgumentsHost;
+  const host = {
+    switchToHttp: () => ({ getResponse: () => ({ status }), getRequest: () => ({ path }) }),
+  } as unknown as ArgumentsHost;
   new AllExceptionsFilter().catch(exception, host);
   return { status, json };
 }
@@ -20,6 +22,17 @@ describe('AllExceptionsFilter', () => {
 
     expect(status).toHaveBeenCalledWith(400);
     expect(json).toHaveBeenCalledWith(body);
+  });
+
+  it('renomme l\'erreur de validation "Invalid analytics parameter" sur les routes analytics', () => {
+    const details = { limit: 'Must be positive integer between 1 and 100' };
+    const { status, json } = run(
+      new BadRequestException({ error: 'Validation failed', details }),
+      '/api/analytics/expensive-tools',
+    );
+
+    expect(status).toHaveBeenCalledWith(400);
+    expect(json).toHaveBeenCalledWith({ error: 'Invalid analytics parameter', details });
   });
 
   it('renvoie le format { error, message } pour une 404 personnalisée', () => {
@@ -39,6 +52,16 @@ describe('AllExceptionsFilter', () => {
 
   it('renvoie une 500 "Database connection failed" quand la base est injoignable', () => {
     const { status, json } = run(Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }));
+
+    expect(status).toHaveBeenCalledWith(500);
+    expect(json).toHaveBeenCalledWith({ error: 'Internal server error', message: 'Database connection failed' });
+  });
+
+  it('renvoie la même 500 sur une route analytics', () => {
+    const { status, json } = run(
+      Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' }),
+      '/api/analytics/department-costs',
+    );
 
     expect(status).toHaveBeenCalledWith(500);
     expect(json).toHaveBeenCalledWith({ error: 'Internal server error', message: 'Database connection failed' });

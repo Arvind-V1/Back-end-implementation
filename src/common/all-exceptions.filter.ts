@@ -1,7 +1,7 @@
-import {
-  ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger,
-} from '@nestjs/common';
-import { Response } from 'express';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { Request, Response } from 'express';
+
+const ANALYTICS_PREFIX = '/api/analytics';
 
 const DB_UNAVAILABLE_CODES = [
   'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND',
@@ -13,7 +13,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost) {
-    const res = host.switchToHttp().getResponse<Response>();
+    const http = host.switchToHttp();
+    const res = http.getResponse<Response>();
+    const isAnalytics = (http.getRequest<Request>()?.path ?? '').startsWith(ANALYTICS_PREFIX);
 
     // Erreurs HTTP levées par Nest ou par nos services (400, 404, 409...)
     if (exception instanceof HttpException) {
@@ -22,7 +24,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
       // Erreur de validation : déjà au format { error, details }
       if (typeof body === 'object' && 'details' in body) {
-        return res.status(status).json(body);
+        const validation = body as { error?: string; details: unknown };
+        return res
+          .status(status)
+          .json(isAnalytics && validation.error === 'Validation failed' ? { ...validation, error: 'Invalid analytics parameter' } : validation);
       }
 
       const { error, message } =

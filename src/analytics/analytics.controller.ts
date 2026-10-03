@@ -21,7 +21,7 @@ export class AnalyticsController {
   @ApiResponse({
     status: 400,
     description: 'Paramètre de tri invalide',
-    schema: { example: { error: 'Validation failed', details: { sort_by: 'Must be one of: total_cost, department, tools_count, total_users' } } },
+    schema: { example: { error: 'Invalid analytics parameter', details: { sort_by: 'Must be one of: total_cost, department, tools_count, total_users' } } },
   })
   @ApiResponse({
     status: 500,
@@ -44,7 +44,7 @@ export class AnalyticsController {
   @ApiResponse({
     status: 400,
     description: 'Paramètre invalide',
-    schema: { example: { error: 'Validation failed', details: { limit: 'Must be an integer between 1 and 100' } } },
+    schema: { example: { error: 'Invalid analytics parameter', details: { limit: 'Invalid analytics parameter' } } },
   })
   @ApiResponse({
     status: 500,
@@ -86,7 +86,7 @@ export class AnalyticsController {
   @ApiResponse({
     status: 400,
     description: 'max_users invalide',
-    schema: { example: { error: 'Validation failed', details: { max_users: 'Must be a non-negative integer' } } },
+    schema: { example: { error: 'Invalid analytics parameter', details: { max_users: 'Must be a non-negative integer' } } },
   })
   @ApiResponse({
     status: 500,
